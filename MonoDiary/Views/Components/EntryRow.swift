@@ -32,6 +32,16 @@ struct EntryRow: View {
 
                 HStack(spacing: 8) {
                     MoodTag(mood: entry.mood, colors: colors)
+                    if !entry.location.isEmpty {
+                        HStack(spacing: 3) {
+                            Image(systemName: "location.fill")
+                                .font(.system(size: 8, weight: .semibold))
+                            Text(entry.location)
+                                .font(.system(.caption2, design: .serif))
+                                .lineLimit(1)
+                        }
+                        .foregroundStyle(colors.secondaryText)
+                    }
                     Spacer()
                     Image(systemName: "chevron.right")
                         .font(.system(size: 10, weight: .semibold))

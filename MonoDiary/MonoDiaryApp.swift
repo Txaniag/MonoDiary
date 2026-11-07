@@ -9,7 +9,7 @@ struct MonoDiaryApp: App {
         WindowGroup {
             RootView()
                 .environment(settings)
-                .modelContainer(for: DiaryEntry.self)
+                .modelContainer(for: [DiaryEntry.self, DiaryPhoto.self])
         }
     }
 }

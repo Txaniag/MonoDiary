@@ -10,8 +10,11 @@ final class DiaryEntry {
     var date: Date
     var createdAt: Date
     var updatedAt: Date
+    var location: String
+    @Relationship(deleteRule: .cascade, inverse: \DiaryPhoto.entry)
+    var photos: [DiaryPhoto]
 
-    init(title: String = "", content: String = "", moodRaw: String = Mood.calm.rawValue, date: Date = Date()) {
+    init(title: String = "", content: String = "", moodRaw: String = Mood.calm.rawValue, date: Date = Date(), location: String = "") {
         self.id = UUID()
         self.title = title
         self.content = content
@@ -19,6 +22,8 @@ final class DiaryEntry {
         self.date = date
         self.createdAt = Date()
         self.updatedAt = Date()
+        self.location = location
+        self.photos = []
     }
 
     var mood: Mood {
