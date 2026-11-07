@@ -104,8 +104,8 @@ struct HomeView: View {
         }
         .sheet(item: $selectedEntry) { entry in
             EntryDetailView(
-                entry: entry,
                 settings: settings,
+                entry: entry,
                 onDelete: {
                     selectedEntry = nil
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -116,7 +116,7 @@ struct HomeView: View {
             .preferredColorScheme(settings.appearance.colorScheme)
         }
         .fullScreenCover(isPresented: $showingEditor) {
-            EditorView(entry: nil, settings: settings)
+            EditorView(settings: settings, entry: nil)
                 .preferredColorScheme(settings.appearance.colorScheme)
         }
     }
@@ -184,3 +184,4 @@ struct IndexedDayGroup: Identifiable {
     let group: DayGroup
     var id: Date { group.day }
 }
+

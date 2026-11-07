@@ -105,11 +105,11 @@ struct EntryDetailView: View {
                 }
             }
             .fullScreenCover(isPresented: $showingEditor) {
-                EditorView(entry: entry, settings: settings)
+                EditorView(settings: settings, entry: entry)
                     .preferredColorScheme(settings.appearance.colorScheme)
             }
             .sheet(isPresented: $showingCard) {
-                CardGeneratorView(entry: entry, settings: settings)
+                CardGeneratorView(settings: settings, entry: entry)
                     .preferredColorScheme(settings.appearance.colorScheme)
             }
             .fullScreenCover(item: $viewingPhoto) { photo in
@@ -175,3 +175,4 @@ struct PhotoViewer: View {
         .statusBarHidden(true)
     }
 }
+
