@@ -1,13 +1,12 @@
 import SwiftUI
-import SwiftData
 
 struct EntryDetailView: View {
-    @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @Environment(AppSettings.self) private var settings
     @Environment(\.colorScheme) private var systemScheme
 
     let entry: DiaryEntry
+    let onDelete: () -> Void
 
     @State private var showingEditor = false
     @State private var showingCard = false
@@ -75,7 +74,7 @@ struct EntryDetailView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button(role: .destructive) {
-                        delete()
+                        onDelete()
                     } label: {
                         Image(systemName: "trash")
                             .font(.system(size: 14, weight: .medium))
@@ -92,12 +91,5 @@ struct EntryDetailView: View {
                     .environment(settings)
             }
         }
-    }
-
-    private func delete() {
-        modelContext.delete(entry)
-        try? modelContext.save()
-        Haptics.medium()
-        dismiss()
     }
 }

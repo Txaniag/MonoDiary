@@ -32,6 +32,10 @@ struct HomeView: View {
             .sorted { $0.day > $1.day }
     }
 
+    private var indexedGroups: [IndexedDayGroup] {
+        grouped.enumerated().map { IndexedDayGroup(index: $0.offset, group: $0.element) }
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -40,11 +44,10 @@ struct HomeView: View {
                     if filteredEntries.isEmpty {
                         emptyState
                     } else {
-                        ForEach(grouped.indices, id: \.self) { index in
-                            let group = grouped[index]
+                        ForEach(indexedGroups) { item in
                             DaySection(
-                                date: group.day,
-                                entries: group.entries,
+                                date: item.group.day,
+                                entries: item.group.entries,
                                 colors: colors,
                                 onTap: { entry in
                                     selectedEntry = entry
@@ -55,7 +58,7 @@ struct HomeView: View {
                             )
                             .opacity(appeared ? 1 : 0)
                             .offset(y: appeared ? 0 : 10)
-                            .animation(.easeOut(duration: 0.28).delay(Double(index) * 0.05), value: appeared)
+                            .animation(.easeOut(duration: 0.28).delay(Double(item.index) * 0.05), value: appeared)
                         }
                     }
                 }
@@ -100,8 +103,16 @@ struct HomeView: View {
                 .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedEntry) { entry in
-            EntryDetailView(entry: entry)
-                .environment(settings)
+            EntryDetailView(
+                entry: entry,
+                onDelete: {
+                    selectedEntry = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        delete(entry)
+                    }
+                }
+            )
+            .environment(settings)
         }
         .fullScreenCover(isPresented: $showingEditor) {
             EditorView(entry: nil)
@@ -167,3 +178,8 @@ struct DayGroup: Identifiable {
     var id: Date { day }
 }
 
+struct IndexedDayGroup: Identifiable {
+    let index: Int
+    let group: DayGroup
+    var id: Date { group.day }
+}
