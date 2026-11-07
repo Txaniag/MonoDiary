@@ -4,7 +4,7 @@ import SwiftData
 struct EditorView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Environment(AppSettings.self) private var settings
+    let settings: AppSettings
     @Environment(\.colorScheme) private var systemScheme
 
     let entry: DiaryEntry?
@@ -164,4 +164,3 @@ struct EditorView: View {
         dismiss()
     }
 }
-

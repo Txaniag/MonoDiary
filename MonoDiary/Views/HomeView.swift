@@ -97,14 +97,15 @@ struct HomeView: View {
             .searchable(text: $searchText, prompt: "搜索日记")
         }
         .sheet(isPresented: $showingSettings) {
-            SettingsView()
-                .environment(settings)
+            SettingsView(settings: settings)
+                .preferredColorScheme(settings.appearance.colorScheme)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
         .sheet(item: $selectedEntry) { entry in
             EntryDetailView(
                 entry: entry,
+                settings: settings,
                 onDelete: {
                     selectedEntry = nil
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
@@ -112,11 +113,11 @@ struct HomeView: View {
                     }
                 }
             )
-            .environment(settings)
+            .preferredColorScheme(settings.appearance.colorScheme)
         }
         .fullScreenCover(isPresented: $showingEditor) {
-            EditorView(entry: nil)
-                .environment(settings)
+            EditorView(entry: nil, settings: settings)
+                .preferredColorScheme(settings.appearance.colorScheme)
         }
     }
 

@@ -1,8 +1,7 @@
 import SwiftUI
 
 struct EntryDetailView: View {
-    @Environment(\.dismiss) private var dismiss
-    @Environment(AppSettings.self) private var settings
+    let settings: AppSettings
     @Environment(\.colorScheme) private var systemScheme
 
     let entry: DiaryEntry
@@ -83,13 +82,14 @@ struct EntryDetailView: View {
                 }
             }
             .fullScreenCover(isPresented: $showingEditor) {
-                EditorView(entry: entry)
-                    .environment(settings)
+                EditorView(entry: entry, settings: settings)
+                    .preferredColorScheme(settings.appearance.colorScheme)
             }
             .sheet(isPresented: $showingCard) {
-                CardGeneratorView(entry: entry)
-                    .environment(settings)
+                CardGeneratorView(entry: entry, settings: settings)
+                    .preferredColorScheme(settings.appearance.colorScheme)
             }
         }
     }
 }
+

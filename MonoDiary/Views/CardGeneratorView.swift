@@ -2,7 +2,7 @@ import SwiftUI
 import UIKit
 
 struct CardGeneratorView: View {
-    @Environment(AppSettings.self) private var settings
+    let settings: AppSettings
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.dismiss) private var dismiss
 
