@@ -113,7 +113,8 @@ struct DiaryCardView: View {
         let maxLength = 110
         if text.count <= maxLength { return text }
         let end = text.index(text.startIndex, offsetBy: maxLength)
-        return String(text[..end]) + "……"
+        return String(text[..<end]) + "……"
     }
 }
+
 
