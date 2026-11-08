@@ -11,7 +11,6 @@ struct HomeView: View {
     @State private var showingEditor = false
     @State private var showingSettings = false
     @State private var selectedEntry: DiaryEntry?
-    @State private var appeared = false
 
     private var colors: ThemeColors { settings.colors(for: systemScheme) }
 
@@ -32,10 +31,6 @@ struct HomeView: View {
             .sorted { $0.day > $1.day }
     }
 
-    private var indexedGroups: [IndexedDayGroup] {
-        grouped.enumerated().map { IndexedDayGroup(index: $0.offset, group: $0.element) }
-    }
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -44,10 +39,10 @@ struct HomeView: View {
                     if filteredEntries.isEmpty {
                         emptyState
                     } else {
-                        ForEach(indexedGroups) { item in
+                        ForEach(grouped) { group in
                             DaySection(
-                                date: item.group.day,
-                                entries: item.group.entries,
+                                date: group.day,
+                                entries: group.entries,
                                 colors: colors,
                                 onTap: { entry in
                                     selectedEntry = entry
@@ -56,20 +51,12 @@ struct HomeView: View {
                                     delete(entry)
                                 }
                             )
-                            .opacity(appeared ? 1 : 0)
-                            .offset(y: appeared ? 0 : 10)
-                            .animation(.easeOut(duration: 0.28).delay(Double(item.index) * 0.05), value: appeared)
                         }
                     }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 8)
                 .padding(.bottom, 40)
-                .onAppear {
-                    withAnimation(.easeOut(duration: 0.3)) {
-                        appeared = true
-                    }
-                }
             }
             .background(colors.background.ignoresSafeArea())
             .scrollDismissesKeyboard(.interactively)
@@ -178,10 +165,3 @@ struct DayGroup: Identifiable {
     let entries: [DiaryEntry]
     var id: Date { day }
 }
-
-struct IndexedDayGroup: Identifiable {
-    let index: Int
-    let group: DayGroup
-    var id: Date { group.day }
-}
-

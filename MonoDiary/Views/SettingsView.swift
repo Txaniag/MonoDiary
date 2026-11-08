@@ -5,7 +5,23 @@ struct SettingsView: View {
     @Environment(\.colorScheme) private var systemScheme
     @Environment(\.dismiss) private var dismiss
 
-    private var colors: ThemeColors { settings.colors(for: systemScheme) }
+    @AppStorage("settings.appearance") private var appearanceRaw = AppearanceMode.system.rawValue
+    @AppStorage("settings.accent") private var accentRaw = AccentOption.cinnabar.rawValue
+    @AppStorage("settings.monochrome") private var isMonochrome = false
+
+    private var appearance: AppearanceMode {
+        get { AppearanceMode(rawValue: appearanceRaw) ?? .system }
+        set { appearanceRaw = newValue.rawValue }
+    }
+
+    private var accent: AccentOption {
+        get { AccentOption(rawValue: accentRaw) ?? .cinnabar }
+        set { accentRaw = newValue.rawValue }
+    }
+
+    private var colors: ThemeColors {
+        AppSettings.makeColors(appearance: appearance, accent: accent, isMonochrome: isMonochrome, scheme: systemScheme)
+    }
 
     var body: some View {
         NavigationStack {
@@ -38,6 +54,7 @@ struct SettingsView: View {
                     Button {
                         settings.appearance = mode
                         settings.persist()
+                        appearanceRaw = mode.rawValue
                     } label: {
                         VStack(spacing: 6) {
                             Image(systemName: icon(for: mode))
@@ -47,8 +64,8 @@ struct SettingsView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(settings.appearance == mode ? colors.text : colors.surfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                        .foregroundStyle(settings.appearance == mode ? colors.surface : colors.secondaryText)
+                        .background(appearance == mode ? colors.text : colors.surfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .foregroundStyle(appearance == mode ? colors.surface : colors.secondaryText)
                     }
                     .buttonStyle(ScaleButtonStyle())
                 }
@@ -75,10 +92,11 @@ struct SettingsView: View {
                 }
                 Spacer()
                 Toggle("", isOn: Binding(
-                    get: { settings.isMonochrome },
+                    get: { isMonochrome },
                     set: { newValue in
                         settings.isMonochrome = newValue
                         settings.persist()
+                        isMonochrome = newValue
                     }
                 ))
                 .labelsHidden()
@@ -101,6 +119,7 @@ struct SettingsView: View {
                     Button {
                         settings.accent = option
                         settings.persist()
+                        accentRaw = option.rawValue
                     } label: {
                         VStack(spacing: 8) {
                             Circle()
@@ -113,20 +132,20 @@ struct SettingsView: View {
                                     Image(systemName: "checkmark")
                                         .font(.system(size: 12, weight: .bold))
                                         .foregroundStyle(.white)
-                                        .opacity(settings.accent == option ? 1 : 0)
+                                        .opacity(accent == option ? 1 : 0)
                                 )
                             Text(option.title)
                                 .font(.system(.caption, design: .serif))
-                                .foregroundStyle(settings.accent == option ? colors.text : colors.secondaryText)
+                                .foregroundStyle(accent == option ? colors.text : colors.secondaryText)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
-                        .background(settings.accent == option ? colors.surfaceSecondary : .clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .background(accent == option ? colors.surfaceSecondary : .clear, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .buttonStyle(ScaleButtonStyle())
                 }
             }
-            if settings.isMonochrome {
+            if isMonochrome {
                 Text("黑白模式下主题色会被隐藏。")
                     .font(.system(.caption, design: .serif))
                     .foregroundStyle(colors.tertiaryText)

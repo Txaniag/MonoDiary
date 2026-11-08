@@ -59,15 +59,16 @@ final class LocationManager: NSObject, CLLocationManagerDelegate {
     }
 
     private static func placeName(from placemark: CLPlacemark) -> String {
+        if let name = placemark.name, !name.isEmpty {
+            return name
+        }
         if let locality = placemark.locality, let subLocality = placemark.subLocality {
             return "\(locality) · \(subLocality)"
         }
         if let locality = placemark.locality {
             return locality
         }
-        if let name = placemark.name {
-            return name
-        }
         return ""
     }
 }
+

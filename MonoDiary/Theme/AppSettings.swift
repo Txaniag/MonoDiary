@@ -91,6 +91,10 @@ final class AppSettings {
     }
 
     func colors(for scheme: ColorScheme? = nil) -> ThemeColors {
+        Self.makeColors(appearance: appearance, accent: accent, isMonochrome: isMonochrome, scheme: scheme)
+    }
+
+    static func makeColors(appearance: AppearanceMode, accent: AccentOption, isMonochrome: Bool, scheme: ColorScheme?) -> ThemeColors {
         let dark: Bool
         switch appearance {
         case .system:
