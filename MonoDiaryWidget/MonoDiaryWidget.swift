@@ -24,8 +24,9 @@ struct DiaryWidgetProvider: TimelineProvider {
             matching: DateComponents(hour: 0, minute: 0),
             matchingPolicy: .nextTime
         ) ?? now.addingTimeInterval(3_600)
+        let refreshDate = min(nextRefresh, now.addingTimeInterval(15 * 60))
 
-        completion(Timeline(entries: [entry], policy: .after(nextRefresh)))
+        completion(Timeline(entries: [entry], policy: .after(refreshDate)))
     }
 }
 

@@ -23,7 +23,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.monodiary.app.widget
         PRODUCT_NAME: MonoDiaryWidgetExtension
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "7"
+        CURRENT_PROJECT_VERSION: "8"
         GENERATE_INFOPLIST_FILE: NO
         INFOPLIST_FILE: MonoDiaryWidget/Info.plist
         CODE_SIGN_ENTITLEMENTS: MonoDiaryWidget/MonoDiaryWidget.entitlements
@@ -46,7 +46,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.monodiary.app
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "7"
+        CURRENT_PROJECT_VERSION: "8"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: "墨记"
         INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "需要访问相册，以保存你生成的日记卡片。"

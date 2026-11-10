@@ -128,11 +128,8 @@ struct HomeView: View {
                 .preferredColorScheme(resolvedColorScheme)
                 .environment(\.colorScheme, resolvedColorScheme)
         }
-        .onAppear {
+        .task(id: widgetSnapshot) {
             WidgetSnapshotStore.save(widgetSnapshot)
-        }
-        .onChange(of: widgetSnapshot) { _, snapshot in
-            WidgetSnapshotStore.save(snapshot)
         }
         .onChange(of: scenePhase) { _, phase in
             guard phase == .background, settings.biometricLockEnabled else { return }
