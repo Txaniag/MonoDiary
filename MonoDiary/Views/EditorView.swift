@@ -334,6 +334,11 @@ struct EditorView: View {
             updatePhotos(for: newEntry)
         }
         try? modelContext.save()
+        WidgetSnapshotCoordinator.refresh(
+            using: modelContext,
+            settings: settings,
+            colorScheme: resolvedColorScheme
+        )
         Haptics.success()
         dismiss()
     }

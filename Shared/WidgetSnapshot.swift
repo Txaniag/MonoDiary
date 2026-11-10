@@ -11,6 +11,7 @@ struct WidgetSnapshot: Codable, Equatable {
     var entryCount: Int
     var latestTitle: String
     var latestDate: Date?
+    var latestUpdatedAt: Date?
     var isMonochrome: Bool
     var isDark: Bool
     var accentHex: UInt32
@@ -19,6 +20,7 @@ struct WidgetSnapshot: Codable, Equatable {
         entryCount: 0,
         latestTitle: "今日无字，心亦安然",
         latestDate: nil,
+        latestUpdatedAt: nil,
         isMonochrome: false,
         isDark: false,
         accentHex: 0xC2472E
@@ -26,6 +28,10 @@ struct WidgetSnapshot: Codable, Equatable {
 }
 
 enum WidgetSnapshotStore {
+    static var isAppGroupAvailable: Bool {
+        snapshotURL != nil
+    }
+
     private static var defaults: UserDefaults {
         UserDefaults(suiteName: WidgetSharedConstants.appGroupID) ?? .standard
     }

@@ -20,14 +20,10 @@ struct HomeView: View {
     private var colors: ThemeColors { settings.colors(for: resolvedColorScheme) }
 
     private var widgetSnapshot: WidgetSnapshot {
-        let isDark = resolvedColorScheme == .dark
-        return WidgetSnapshot(
-            entryCount: entries.count,
-            latestTitle: entries.first?.displayTitle ?? "今日无字，心亦安然",
-            latestDate: entries.first?.date,
-            isMonochrome: settings.isMonochrome,
-            isDark: isDark,
-            accentHex: settings.isMonochrome ? (isDark ? 0xFFFFFF : 0x111111) : settings.accent.hex
+        WidgetSnapshotCoordinator.makeSnapshot(
+            entries: entries,
+            settings: settings,
+            colorScheme: resolvedColorScheme
         )
     }
 
@@ -132,10 +128,17 @@ struct HomeView: View {
             WidgetSnapshotStore.save(widgetSnapshot)
         }
         .onChange(of: scenePhase) { _, phase in
-            guard phase == .background, settings.biometricLockEnabled else { return }
-            showingSettings = false
-            selectedEntry = nil
-            showingEditor = false
+            if phase == .active {
+                WidgetSnapshotCoordinator.refresh(
+                    using: modelContext,
+                    settings: settings,
+                    colorScheme: resolvedColorScheme
+                )
+            } else if phase == .background && settings.biometricLockEnabled {
+                showingSettings = false
+                selectedEntry = nil
+                showingEditor = false
+            }
         }
     }
 
@@ -187,6 +190,11 @@ struct HomeView: View {
     private func delete(_ entry: DiaryEntry) {
         modelContext.delete(entry)
         try? modelContext.save()
+        WidgetSnapshotCoordinator.refresh(
+            using: modelContext,
+            settings: settings,
+            colorScheme: resolvedColorScheme
+        )
         Haptics.medium()
     }
 }

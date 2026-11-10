@@ -219,6 +219,34 @@ struct SettingsView: View {
                     .disabled(changingBiometricLock)
                 }
                 .padding(16)
+
+                Divider()
+                    .overlay(colors.separator)
+                    .padding(.leading, 70)
+
+                HStack(spacing: 14) {
+                    Image(systemName: "rectangle.3.group")
+                        .font(.system(size: 20, weight: .light))
+                        .foregroundStyle(colors.accent)
+                        .frame(width: 40, height: 40)
+                        .background(colors.surfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("桌面小组件")
+                            .font(.system(.body, design: .serif, weight: .semibold))
+                            .foregroundStyle(colors.text)
+                        Text("共享日记摘要和当前外观。")
+                            .font(.system(.caption, design: .serif))
+                            .foregroundStyle(colors.secondaryText)
+                    }
+
+                    Spacer()
+
+                    Text(WidgetSnapshotStore.isAppGroupAvailable ? "已连接" : "不可用")
+                        .font(.system(.caption, design: .serif, weight: .medium))
+                        .foregroundStyle(WidgetSnapshotStore.isAppGroupAvailable ? colors.accent : colors.tertiaryText)
+                }
+                .padding(16)
             }
             .background(colors.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
