@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class DiaryPhoto {
-    @Attribute(.unique) var id: UUID
-    @Attribute(.externalStorage) var data: Data
-    var sortOrder: Int
+    var id: UUID = UUID()
+    @Attribute(.externalStorage) var data: Data = Data()
+    var sortOrder: Int = 0
     var entry: DiaryEntry?
 
     init(data: Data, sortOrder: Int) {

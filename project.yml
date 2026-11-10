@@ -1,5 +1,3 @@
-# Optional: regenerate MonoDiary.xcodeproj with XcodeGen (https://github.com/yonaskolb/XcodeGen)
-# Usage: xcodegen generate
 name: MonoDiary
 options:
   bundleIdPrefix: com.monodiary
@@ -11,34 +9,60 @@ settings:
   base:
     SWIFT_VERSION: "5.0"
 targets:
+  MonoDiaryWidgetExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: MonoDiaryWidget
+        excludes:
+          - Info.plist
+          - MonoDiaryWidget.entitlements
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.monodiary.app.widget
+        PRODUCT_NAME: MonoDiaryWidgetExtension
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "7"
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: MonoDiaryWidget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: MonoDiaryWidget/MonoDiaryWidget.entitlements
+        SKIP_INSTALL: YES
+        APPLICATION_EXTENSION_API_ONLY: YES
+        TARGETED_DEVICE_FAMILY: "1,2"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks"
   MonoDiary:
     type: application
     platform: iOS
     sources:
-      - MonoDiary
+      - path: MonoDiary
+        excludes:
+          - MonoDiary.entitlements
+      - path: Shared
+    dependencies:
+      - target: MonoDiaryWidgetExtension
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.monodiary.app
         MARKETING_VERSION: "1.0"
-        CURRENT_PROJECT_VERSION: "6"
+        CURRENT_PROJECT_VERSION: "7"
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: "墨记"
-                INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "需要访问相册，以保存你生成的日记卡片。"
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "需要访问相册，以保存你生成的日记卡片。"
         INFOPLIST_KEY_NSCameraUsageDescription: "需要使用相机拍摄照片，添加到你的日记中。"
         INFOPLIST_KEY_NSLocationWhenInUseUsageDescription: "需要使用你的位置，在日记中记录当下的地点。"
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "需要访问相册以选择照片添加到日记。"
+        INFOPLIST_KEY_NSFaceIDUsageDescription: "使用面容 ID 解锁墨记，保护你的日记隐私。"
         INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
         INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: YES
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
         CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: MonoDiary/MonoDiary.entitlements
         TARGETED_DEVICE_FAMILY: "1,2"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
     scheme:
       testTargets: []
-
-
-
-

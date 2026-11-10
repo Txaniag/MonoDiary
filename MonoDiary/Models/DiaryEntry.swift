@@ -3,16 +3,16 @@ import SwiftData
 
 @Model
 final class DiaryEntry {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var content: String
-    var moodRaw: String
-    var date: Date
-    var createdAt: Date
-    var updatedAt: Date
-    var location: String
+    var id: UUID = UUID()
+    var title: String = ""
+    var content: String = ""
+    var moodRaw: String = Mood.calm.rawValue
+    var date: Date = Date()
+    var createdAt: Date = Date()
+    var updatedAt: Date = Date()
+    var location: String = ""
     @Relationship(deleteRule: .cascade, inverse: \DiaryPhoto.entry)
-    var photos: [DiaryPhoto]
+    var photos: [DiaryPhoto]? = []
 
     init(title: String = "", content: String = "", moodRaw: String = Mood.calm.rawValue, date: Date = Date(), location: String = "") {
         self.id = UUID()

@@ -19,7 +19,7 @@ struct EntryDetailView: View {
     private var colors: ThemeColors { settings.colors(for: resolvedColorScheme) }
 
     private var sortedPhotos: [DiaryPhoto] {
-        entry.photos.sorted { $0.sortOrder < $1.sortOrder }
+        (entry.photos ?? []).sorted { $0.sortOrder < $1.sortOrder }
     }
 
     var body: some View {

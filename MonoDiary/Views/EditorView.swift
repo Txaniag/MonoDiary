@@ -309,7 +309,7 @@ struct EditorView: View {
         } else {
             locationManager.currentPlace = entry.location
         }
-        photoItems = entry.photos
+        photoItems = (entry.photos ?? [])
             .sorted { $0.sortOrder < $1.sortOrder }
             .compactMap { PhotoItem(data: $0.data) }
     }
@@ -339,7 +339,7 @@ struct EditorView: View {
     }
 
     private func updatePhotos(for entry: DiaryEntry) {
-        let oldPhotos = Array(entry.photos)
+        let oldPhotos = Array(entry.photos ?? [])
         for photo in oldPhotos {
             modelContext.delete(photo)
         }

@@ -5,6 +5,7 @@ struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppSettings.self) private var settings
     @Environment(\.colorScheme) private var systemScheme
+    @Environment(\.scenePhase) private var scenePhase
 
     @Query(sort: \DiaryEntry.date, order: .reverse) private var entries: [DiaryEntry]
     @State private var searchText = ""
@@ -17,6 +18,18 @@ struct HomeView: View {
     }
 
     private var colors: ThemeColors { settings.colors(for: resolvedColorScheme) }
+
+    private var widgetSnapshot: WidgetSnapshot {
+        let isDark = resolvedColorScheme == .dark
+        return WidgetSnapshot(
+            entryCount: entries.count,
+            latestTitle: entries.first?.displayTitle ?? "今日无字，心亦安然",
+            latestDate: entries.first?.date,
+            isMonochrome: settings.isMonochrome,
+            isDark: isDark,
+            accentHex: settings.isMonochrome ? (isDark ? 0xFFFFFF : 0x111111) : settings.accent.hex
+        )
+    }
 
     private var filteredEntries: [DiaryEntry] {
         let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -114,6 +127,18 @@ struct HomeView: View {
             EditorView(settings: settings, entry: nil)
                 .preferredColorScheme(resolvedColorScheme)
                 .environment(\.colorScheme, resolvedColorScheme)
+        }
+        .onAppear {
+            WidgetSnapshotStore.save(widgetSnapshot)
+        }
+        .onChange(of: widgetSnapshot) { _, snapshot in
+            WidgetSnapshotStore.save(snapshot)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard phase == .background, settings.biometricLockEnabled else { return }
+            showingSettings = false
+            selectedEntry = nil
+            showingEditor = false
         }
     }
 

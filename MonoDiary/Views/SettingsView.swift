@@ -3,7 +3,10 @@ import SwiftUI
 struct SettingsView: View {
     @Bindable var settings: AppSettings
     let systemColorScheme: ColorScheme
+    @Environment(AppLock.self) private var appLock
     @Environment(\.dismiss) private var dismiss
+    @State private var changingBiometricLock = false
+    @State private var biometricNote: String?
 
     private var appearance: AppearanceMode { settings.appearance }
     private var accent: AccentOption { settings.accent }
@@ -23,6 +26,7 @@ struct SettingsView: View {
                     appearanceSection
                     monochromeSection
                     accentSection
+                    securitySection
                     aboutSection
                 }
                 .padding(20)
@@ -146,6 +150,90 @@ struct SettingsView: View {
         }
     }
 
+    private var securitySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("同步与安全")
+
+            VStack(spacing: 0) {
+                HStack(spacing: 14) {
+                    Image(systemName: "icloud.fill")
+                        .font(.system(size: 20, weight: .light))
+                        .foregroundStyle(colors.accent)
+                        .frame(width: 40, height: 40)
+                        .background(colors.surfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("iCloud 同步")
+                            .font(.system(.body, design: .serif, weight: .semibold))
+                            .foregroundStyle(colors.text)
+                        Text("日记会通过你的 iCloud 账户自动同步。")
+                            .font(.system(.caption, design: .serif))
+                            .foregroundStyle(colors.secondaryText)
+                    }
+
+                    Spacer()
+
+                    Text("自动")
+                        .font(.system(.caption, design: .serif, weight: .medium))
+                        .foregroundStyle(colors.secondaryText)
+                }
+                .padding(16)
+
+                Divider()
+                    .overlay(colors.separator)
+                    .padding(.leading, 70)
+
+                HStack(spacing: 14) {
+                    Group {
+                        if changingBiometricLock {
+                            ProgressView()
+                                .controlSize(.small)
+                        } else {
+                            Image(systemName: "faceid")
+                                .font(.system(size: 20, weight: .light))
+                        }
+                    }
+                    .foregroundStyle(colors.accent)
+                    .frame(width: 40, height: 40)
+                    .background(colors.surfaceSecondary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("应用锁")
+                            .font(.system(.body, design: .serif, weight: .semibold))
+                            .foregroundStyle(colors.text)
+                        Text("使用面容、触控 ID 或设备密码解锁。")
+                            .font(.system(.caption, design: .serif))
+                            .foregroundStyle(colors.secondaryText)
+                    }
+
+                    Spacer()
+
+                    Toggle("", isOn: Binding(
+                        get: { settings.biometricLockEnabled },
+                        set: { enabled in
+                            Task { await updateBiometricLock(enabled) }
+                        }
+                    ))
+                    .labelsHidden()
+                    .tint(colors.text)
+                    .disabled(changingBiometricLock)
+                }
+                .padding(16)
+            }
+            .background(colors.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(colors.separator, lineWidth: 1)
+            )
+
+            if let biometricNote {
+                Text(biometricNote)
+                    .font(.system(.caption, design: .serif))
+                    .foregroundStyle(colors.tertiaryText)
+            }
+        }
+    }
+
     private var aboutSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("关于")
@@ -191,6 +279,40 @@ struct SettingsView: View {
         case .system: "circle.lefthalf.filled"
         case .light: "sun.max"
         case .dark: "moon"
+        }
+    }
+
+    @MainActor
+    private func updateBiometricLock(_ enabled: Bool) async {
+        guard enabled else {
+            settings.biometricLockEnabled = false
+            settings.persist()
+            appLock.markUnlocked()
+            biometricNote = nil
+            return
+        }
+
+        let availability = AppLock.availability()
+        guard availability.isAvailable else {
+            settings.biometricLockEnabled = false
+            settings.persist()
+            biometricNote = availability.message
+            return
+        }
+
+        changingBiometricLock = true
+        let unlocked = await appLock.authenticate()
+        changingBiometricLock = false
+
+        if unlocked {
+            settings.biometricLockEnabled = true
+            settings.persist()
+            biometricNote = "已启用，下次回到墨记时需要验证身份。"
+            Haptics.success()
+        } else {
+            settings.biometricLockEnabled = false
+            settings.persist()
+            biometricNote = appLock.errorMessage ?? "未能启用应用锁。"
         }
     }
 }

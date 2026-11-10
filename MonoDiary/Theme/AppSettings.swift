@@ -44,13 +44,15 @@ enum AccentOption: String, CaseIterable, Identifiable {
         }
     }
 
-    var color: Color {
+    var hex: UInt32 {
         switch self {
-        case .cinnabar: Color(hex: 0xC2472E)
-        case .indigo: Color(hex: 0x3B4A6B)
-        case .pine: Color(hex: 0x3D6B54)
+        case .cinnabar: 0xC2472E
+        case .indigo: 0x3B4A6B
+        case .pine: 0x3D6B54
         }
     }
+
+    var color: Color { Color(hex: hex) }
 }
 
 struct ThemeColors {
@@ -69,12 +71,14 @@ final class AppSettings {
     var isMonochrome = false
     var appearanceRaw = AppearanceMode.system.rawValue
     var accentRaw = AccentOption.cinnabar.rawValue
+    var biometricLockEnabled = false
 
     init() {
         let defaults = UserDefaults.standard
         isMonochrome = defaults.bool(forKey: Keys.monochrome)
         appearanceRaw = defaults.string(forKey: Keys.appearance) ?? AppearanceMode.system.rawValue
         accentRaw = defaults.string(forKey: Keys.accent) ?? AccentOption.cinnabar.rawValue
+        biometricLockEnabled = defaults.bool(forKey: Keys.biometricLock)
     }
 
     var appearance: AppearanceMode {
@@ -92,6 +96,7 @@ final class AppSettings {
         defaults.set(isMonochrome, forKey: Keys.monochrome)
         defaults.set(appearanceRaw, forKey: Keys.appearance)
         defaults.set(accentRaw, forKey: Keys.accent)
+        defaults.set(biometricLockEnabled, forKey: Keys.biometricLock)
     }
 
     func colors(for scheme: ColorScheme) -> ThemeColors {
@@ -138,6 +143,7 @@ final class AppSettings {
         static let monochrome = "settings.monochrome"
         static let appearance = "settings.appearance"
         static let accent = "settings.accent"
+        static let biometricLock = "settings.biometricLock"
     }
 }
 
