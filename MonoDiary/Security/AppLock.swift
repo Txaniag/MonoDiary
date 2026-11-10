@@ -94,7 +94,7 @@ final class AppLock {
     static func availability() -> BiometricAvailability {
         let context = LAContext()
         var error: NSError?
-        let available = context.canEvaluatePolicy(.deviceOwnerAuthentication, withError: &error)
+        let available = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
 
         let title: String
         if context.biometryType == .faceID {
