@@ -1,26 +1,19 @@
 import SwiftUI
 
 struct SettingsView: View {
-    let settings: AppSettings
-    @Environment(\.colorScheme) private var systemScheme
+    @Bindable var settings: AppSettings
+    let systemColorScheme: ColorScheme
     @Environment(\.dismiss) private var dismiss
 
-    @AppStorage("settings.appearance") private var appearanceRaw = AppearanceMode.system.rawValue
-    @AppStorage("settings.accent") private var accentRaw = AccentOption.cinnabar.rawValue
-    @AppStorage("settings.monochrome") private var isMonochrome = false
-
-    private var appearance: AppearanceMode {
-        get { AppearanceMode(rawValue: appearanceRaw) ?? .system }
-        set { appearanceRaw = newValue.rawValue }
-    }
-
-    private var accent: AccentOption {
-        get { AccentOption(rawValue: accentRaw) ?? .cinnabar }
-        set { accentRaw = newValue.rawValue }
+    private var appearance: AppearanceMode { settings.appearance }
+    private var accent: AccentOption { settings.accent }
+    private var isMonochrome: Bool { settings.isMonochrome }
+    private var resolvedColorScheme: ColorScheme {
+        appearance.resolved(for: systemColorScheme)
     }
 
     private var colors: ThemeColors {
-        AppSettings.makeColors(appearance: appearance, accent: accent, isMonochrome: isMonochrome, scheme: systemScheme)
+        settings.colors(for: resolvedColorScheme)
     }
 
     var body: some View {
@@ -44,6 +37,9 @@ struct SettingsView: View {
                 }
             }
         }
+        .presentationBackground(colors.background)
+        .preferredColorScheme(resolvedColorScheme)
+        .environment(\.colorScheme, resolvedColorScheme)
     }
 
     private var appearanceSection: some View {
@@ -54,7 +50,6 @@ struct SettingsView: View {
                     Button {
                         settings.appearance = mode
                         settings.persist()
-                        appearanceRaw = mode.rawValue
                     } label: {
                         VStack(spacing: 6) {
                             Image(systemName: icon(for: mode))
@@ -96,7 +91,6 @@ struct SettingsView: View {
                     set: { newValue in
                         settings.isMonochrome = newValue
                         settings.persist()
-                        isMonochrome = newValue
                     }
                 ))
                 .labelsHidden()
@@ -119,7 +113,6 @@ struct SettingsView: View {
                     Button {
                         settings.accent = option
                         settings.persist()
-                        accentRaw = option.rawValue
                     } label: {
                         VStack(spacing: 8) {
                             Circle()

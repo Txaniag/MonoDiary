@@ -12,7 +12,11 @@ struct HomeView: View {
     @State private var showingSettings = false
     @State private var selectedEntry: DiaryEntry?
 
-    private var colors: ThemeColors { settings.colors(for: systemScheme) }
+    private var resolvedColorScheme: ColorScheme {
+        settings.appearance.resolved(for: systemScheme)
+    }
+
+    private var colors: ThemeColors { settings.colors(for: resolvedColorScheme) }
 
     private var filteredEntries: [DiaryEntry] {
         let trimmed = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -84,8 +88,10 @@ struct HomeView: View {
             .searchable(text: $searchText, prompt: "搜索日记")
         }
         .sheet(isPresented: $showingSettings) {
-            SettingsView(settings: settings)
-                .preferredColorScheme(settings.appearance.colorScheme)
+            SettingsView(settings: settings, systemColorScheme: resolvedColorScheme)
+                .preferredColorScheme(resolvedColorScheme)
+                .environment(\.colorScheme, resolvedColorScheme)
+                .presentationBackground(colors.background)
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
@@ -100,11 +106,14 @@ struct HomeView: View {
                     }
                 }
             )
-            .preferredColorScheme(settings.appearance.colorScheme)
+            .preferredColorScheme(resolvedColorScheme)
+            .environment(\.colorScheme, resolvedColorScheme)
+            .presentationBackground(colors.background)
         }
         .fullScreenCover(isPresented: $showingEditor) {
             EditorView(settings: settings, entry: nil)
-                .preferredColorScheme(settings.appearance.colorScheme)
+                .preferredColorScheme(resolvedColorScheme)
+                .environment(\.colorScheme, resolvedColorScheme)
         }
     }
 

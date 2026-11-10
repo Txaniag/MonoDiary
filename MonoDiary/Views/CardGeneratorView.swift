@@ -11,7 +11,11 @@ struct CardGeneratorView: View {
     @State private var style: CardStyle = .minimal
     @State private var savedToast = false
 
-    private var colors: ThemeColors { settings.colors(for: systemScheme) }
+    private var resolvedColorScheme: ColorScheme {
+        settings.appearance.resolved(for: systemScheme)
+    }
+
+    private var colors: ThemeColors { settings.colors(for: resolvedColorScheme) }
 
     var body: some View {
         NavigationStack {
@@ -45,6 +49,8 @@ struct CardGeneratorView: View {
                 }
             }
         }
+        .preferredColorScheme(resolvedColorScheme)
+        .environment(\.colorScheme, resolvedColorScheme)
     }
 
     private var cardPreview: some View {

@@ -23,6 +23,10 @@ enum AppearanceMode: String, CaseIterable, Identifiable {
         case .dark: .dark
         }
     }
+
+    func resolved(for systemScheme: ColorScheme) -> ColorScheme {
+        colorScheme ?? systemScheme
+    }
 }
 
 enum AccentOption: String, CaseIterable, Identifiable {
@@ -90,11 +94,11 @@ final class AppSettings {
         defaults.set(accentRaw, forKey: Keys.accent)
     }
 
-    func colors(for scheme: ColorScheme? = nil) -> ThemeColors {
+    func colors(for scheme: ColorScheme) -> ThemeColors {
         Self.makeColors(appearance: appearance, accent: accent, isMonochrome: isMonochrome, scheme: scheme)
     }
 
-    static func makeColors(appearance: AppearanceMode, accent: AccentOption, isMonochrome: Bool, scheme: ColorScheme?) -> ThemeColors {
+    static func makeColors(appearance: AppearanceMode, accent: AccentOption, isMonochrome: Bool, scheme: ColorScheme) -> ThemeColors {
         let dark: Bool
         switch appearance {
         case .system:

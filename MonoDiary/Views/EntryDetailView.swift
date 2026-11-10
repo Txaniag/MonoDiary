@@ -12,7 +12,11 @@ struct EntryDetailView: View {
     @State private var showingCard = false
     @State private var viewingPhoto: DiaryPhoto?
 
-    private var colors: ThemeColors { settings.colors(for: systemScheme) }
+    private var resolvedColorScheme: ColorScheme {
+        settings.appearance.resolved(for: systemScheme)
+    }
+
+    private var colors: ThemeColors { settings.colors(for: resolvedColorScheme) }
 
     private var sortedPhotos: [DiaryPhoto] {
         entry.photos.sorted { $0.sortOrder < $1.sortOrder }
@@ -106,16 +110,22 @@ struct EntryDetailView: View {
             }
             .fullScreenCover(isPresented: $showingEditor) {
                 EditorView(settings: settings, entry: entry)
-                    .preferredColorScheme(settings.appearance.colorScheme)
+                    .preferredColorScheme(resolvedColorScheme)
+                    .environment(\.colorScheme, resolvedColorScheme)
             }
             .sheet(isPresented: $showingCard) {
                 CardGeneratorView(settings: settings, entry: entry)
-                    .preferredColorScheme(settings.appearance.colorScheme)
+                    .preferredColorScheme(resolvedColorScheme)
+                    .environment(\.colorScheme, resolvedColorScheme)
+                    .presentationBackground(colors.background)
             }
             .fullScreenCover(item: $viewingPhoto) { photo in
                 PhotoViewer(photo: photo, colors: colors)
+                    .preferredColorScheme(.dark)
             }
         }
+        .preferredColorScheme(resolvedColorScheme)
+        .environment(\.colorScheme, resolvedColorScheme)
     }
 
     private var photoGallery: some View {

@@ -26,7 +26,11 @@ struct EditorView: View {
     @State private var selectedPhotos: [PhotosPickerItem] = []
     @State private var locationManager = LocationManager()
 
-    private var colors: ThemeColors { settings.colors(for: systemScheme) }
+    private var resolvedColorScheme: ColorScheme {
+        settings.appearance.resolved(for: systemScheme)
+    }
+
+    private var colors: ThemeColors { settings.colors(for: resolvedColorScheme) }
 
     private var canSave: Bool {
         !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
@@ -72,6 +76,8 @@ struct EditorView: View {
                         .padding(.bottom, 16)
                 }
                 .background(colors.background.ignoresSafeArea())
+                .preferredColorScheme(resolvedColorScheme)
+                .environment(\.colorScheme, resolvedColorScheme)
                 .presentationDetents([.height(420)])
                 .presentationDragIndicator(.visible)
             }
@@ -84,6 +90,8 @@ struct EditorView: View {
             }
             .onAppear(perform: load)
         }
+        .preferredColorScheme(resolvedColorScheme)
+        .environment(\.colorScheme, resolvedColorScheme)
     }
 
     private var topRow: some View {
